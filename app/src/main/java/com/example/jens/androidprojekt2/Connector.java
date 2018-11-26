@@ -1,63 +1,99 @@
 package com.example.jens.androidprojekt2;
 
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.util.Log;
+
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.UUID;
 
-import lejos.pc.comm.NXTConnector;
-import lejos.pc.comm.NXTInfo;
-import lejos.pc.comm.NXTComm;
+public class Connector {
 
-public class Connector{
+    private static final String TAG = "Connector";
 
-    private NXTConnector conn = null;
-    private DataOutputStream output = null;
-    private DataInputStream input = null;
-    private byte data[] = new byte[255];
-    private boolean running = false;
-    private int size = 0;
+    private static final boolean BT_ON = true;
+    private static final boolean BT_OFF = false;
 
-    public Connector(){}
+    private BluetoothAdapter bluetoothAdapter;
+    private BluetoothSocket bluetoothSocket;
+    private String address;
 
-    public boolean connect(NXTInfo ni) {
-        conn = new NXTConnector();
-        boolean connected = conn.connectTo(ni, NXTComm.PACKET);
+    public Connector(String address) {
+        this.address = address;
+        this.bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    }
 
-        if(!connected){
-            return false;
+    public void setBluetooth(boolean state) {
+        if (state == Connector.BT_ON) {
+            // Check if bluetooth is off
+            if (!this.bluetoothAdapter.isEnabled()) {
+                this.bluetoothAdapter.enable();
+                while (!this.bluetoothAdapter.isEnabled())
+                Log.d(Connector.TAG, "Bluetooth turned on");
+
+            }
+
+        }
+        // Check if bluetooth is enabled
+        else if (state == Connector.BT_OFF) {
+            // Check if bluetooth is enabled
+            if (this.bluetoothAdapter.isEnabled()) {
+                this.bluetoothAdapter.disable();
+                while (this.bluetoothAdapter.isEnabled())
+                Log.d(Connector.TAG, "Bluetooth turned off");
+
+            }
+
         }
 
-        output = new DataOutputStream(conn.getOutputStream());
-        input = new DataInputStream(conn.getInputStream());
-        running = true;
-
-        return running;
     }
 
-    public void send(byte data[]) throws IOException{
-        output.write(data);
-        output.flush();
+    public boolean connect() {
+
+        boolean connected;
+        BluetoothDevice nxt = this.bluetoothAdapter.getRemoteDevice(this.address);
+
+        try {
+            this.bluetoothSocket = nxt.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
+            this.bluetoothSocket.connect();
+            connected = true;
+
+        } catch (IOException e) {
+            connected = false;
+
+        }
+
+        return connected;
+
     }
 
-    public void disconnect() throws IOException{
-        running = false;
-        input.close();
-        output.close();
-        conn.close();
+    public Integer readMessage() {
+        Integer message;
+
+        if (this.bluetoothSocket != null) {
+            try {
+                InputStreamReader input = new InputStreamReader(this.bluetoothSocket.getInputStream());
+                message = input.read();
+                Log.d(Connector.TAG, "Successfully read message");
+
+            } catch (IOException e) {
+                message = null;
+                Log.d(Connector.TAG, "Couldn't read message");
+
+            }
+        } else {
+            message = null;
+            Log.d(Connector.TAG, "Couldn't read message");
+
+        }
+
+        return message;
+
     }
 
-    public boolean isConnected(){
-        return running;
-    }
-
-    public int readInt()throws IOException{
-        return input.readInt();
-    }
-
-    public float readFloat()throws IOException{
-        return input.readFloat();
-    }
 }
 
 
