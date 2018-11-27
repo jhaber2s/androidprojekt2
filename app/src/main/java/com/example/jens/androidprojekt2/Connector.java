@@ -8,6 +8,8 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.UUID;
 
 public class Connector {
@@ -20,6 +22,7 @@ public class Connector {
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothSocket bluetoothSocket;
     private String address;
+    private OutputStream output;
 
     public Connector(String address) {
         this.address = address;
@@ -92,6 +95,24 @@ public class Connector {
 
         return message;
 
+    }
+
+    public void sendMessage(int send) {
+        if (this.bluetoothSocket != null) {
+            try {
+                OutputStreamWriter output = new OutputStreamWriter(this.bluetoothSocket.getOutputStream());
+                output.write(send);
+                output.flush();
+                Log.d(Connector.TAG, "Successfully send message");
+
+            } catch (IOException e) {
+                Log.d(Connector.TAG, "Couldn't send message");
+
+            }
+        } else {
+            Log.d(Connector.TAG, "Couldn't send message");
+
+        }
     }
 
 }
