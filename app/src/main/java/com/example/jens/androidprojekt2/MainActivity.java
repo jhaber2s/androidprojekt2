@@ -16,7 +16,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final Button conbutton = findViewById(R.id.connect);
+        final Button qualbutton = findViewById(R.id.qualification);
+        final Button disconnect = findViewById(R.id.disconnect);
         final TextView context = findViewById(R.id.connection);
+        final TextView received = findViewById(R.id.received);
         conbutton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if(conn.connect()){
@@ -24,9 +27,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
+        qualbutton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                conn.sendMessage(99);
+            }
+        });
+        disconnect.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                conn.sendMessage(50);
+            }
+        });
     }
-
-
 
 }
