@@ -25,5 +25,14 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation files('libs/classes.jar')
+    implementation files('libs/pc/charting.jar')
+    implementation files('libs/pc/jtools.jar')
+    implementation files('libs/pc/pccomm.jar')
+    implementation files('libs/pc/pctools.jar')
+    implementation files('libs/pc/3rdparty/bcel.jar')
+    implementation files('libs/pc/3rdparty/bluecove-gpl.jar')
+    implementation files('libs/pc/3rdparty/bluecove.jar')
+    implementation files('libs/pc/3rdparty/commons-cli.jar')
+    implementation files('libs/pc/3rdparty/jcommon.jar')
+    implementation files('libs/pc/3rdparty/jfreechart.jar')
 }
